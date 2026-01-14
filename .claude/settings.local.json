@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash",
-      "Skill(papers-reader)"
+      "Skill(papers-reader)",
+      "Skill(paper-reader)",
+      "Skill(paper-reader:*)"
     ]
   }
 }
