@@ -1,0 +1,92 @@
+---
+name: youtube-clipper
+description: >
+  **YouTube 智能精剪 Pro**。
+  采用最先进的 "Agentic Workflow" 架构，利用专家级 Subagent 进行内容分析和双语翻译。
+  支持交互式反馈循环，确保剪辑逻辑和翻译质量完全符合用户意图。
+  功能：下载视频 -> AI 智能切分 (交互式) -> 自动提取素材 -> AI 双语翻译 -> 自动烧录硬字幕。
+allowed-tools:
+  - Read
+  - Write
+  - Bash
+  - Glob
+  - AskUserQuestion
+model: claude-sonnet-4-5-20250514
+---
+
+# YouTube 智能精剪 Pro (Agentic Workflow)
+
+作为主智能体 (Main Agent)，你的职责是 **“指挥官” (Orchestrator)**。
+你不再需要亲自去处理正则表达式或逐字翻译，你的任务是协调 Python 脚本和专家 Subagent 来共同完成任务。
+
+## 🗓️ 工作流概览
+
+1.  **初始化 (Setup)**: 下载视频与素材。
+2.  **规划 (Planning)**: 唤醒 `AnalysisAgent` 分析内容，直到用户满意。
+3.  **生产 (Production)**: 自动切分和整理素材。
+4.  **翻译 (Translation)**: 唤醒 `TranslationAgent` 批量处理字幕。
+5.  **合成 (Assembly)**: 自动烧录最终成品。
+
+---
+
+## 🚦 执行步骤指南
+
+请严格遵循以下剧本执行：
+
+### Step 1: 准备素材 (Download)
+询问用户 YouTube URL,然后执行:
+```bash
+python3 scripts/video_clipper_pro.py download <URL> --browser chrome
+```
+
+> 💡 **为什么使用 `--browser chrome`?** 
+> YouTube 现在会进行机器人检测,使用浏览器 Cookie 可以绕过验证。
+> 如果您使用其他浏览器,可以改为 `--browser firefox` 或 `--browser safari`
+
+下载完成后,继续执行:
+```bash
+python3 scripts/video_clipper_pro.py prepare
+```
+> 💡 脚本会输出一个 `for_analysis_agent.txt` 文件路径。请记住它。
+
+### Step 2: 智能分析 (Analysis Loop)
+**这里是关键交互点。**
+1.  **切换角色**: 此时,请你调用/扮演 **AnalysisAgent** (`.claude/agents/AnalysisAgent.md`)。
+2.  **输入**: 读取 `for_analysis_agent.txt`。
+3.  **任务**: 按照 AnalysisAgent 的 Prompt 要求,生成章节方案,并**询问用户反馈**。
+4.  **循环**: 如果用户不满意,持续修改,直到用户确认。
+5.  **输出**: 最终确认后,请手动将生成的 JSON 内容保存到 `youtube_clips_pro/chapters.json` 文件中。
+
+### Step 3: 原子化生产 (Asset Splitting)
+确认 `chapters.json` 存在后，执行：
+```bash
+python3 scripts/video_clipper_pro.py split
+```
+> 💡 脚本会为每个章节创建独立的文件夹 (`Clip_Name/`)，并生成 `en.srt`。
+
+### Step 4: 专家翻译 (Translation)
+**这一步需要批量处理。**
+1.  列出 `youtube_clips_pro/` 下所有的章节文件夹。
+2.  对于每一个文件夹：
+    *   **切换角色**: 调用/扮演 **TranslationAgent** (`.claude/agents/TranslationAgent.md`)。
+    *   **输入**: 读取该文件夹下的 `en.srt`。
+    *   **任务**: 翻译为中英双语字幕。
+    *   **输出**: 将结果保存为同目录下的 `zh_en.srt`。
+
+### Step 5: 最终合成 (Burn & Deliver)
+当所有章节都已生成 `zh_en.srt` 后，执行：
+```bash
+python3 scripts/video_clipper_pro.py burn
+```
+> 💡 脚本会自动遍历所有目录，检测双语字幕并烧录。
+
+### Step 6: 交付 (Delivery)
+向用户展示最终生成的文件列表：
+*   文件结构 (Tree view)
+*   快速预览命令 (`open ...`)
+
+---
+
+## 🛠️ 故障排查
+*   如果 AnalysisAgent 表现不佳，提醒用户可以提供更具体的指令（如“只切3段”）。
+*   如果 TranslationAgent 术语不准，可以在 Context 中补充术语表。

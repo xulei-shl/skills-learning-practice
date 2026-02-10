@@ -1,2 +1,5 @@
 # datas/
 */backup/
+
+# Auto Claude data directory
+.auto-claude/
