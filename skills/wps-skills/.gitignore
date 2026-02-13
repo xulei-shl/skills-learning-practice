@@ -1,6 +1,3 @@
-# datas/
-*/backup/
-
 # 环境变量配置文件（包含敏感信息）
 .env
 
@@ -18,7 +15,3 @@ __pycache__/
 venv/
 env/
 ENV/
-
-
-# Auto Claude data directory
-.auto-claude/
