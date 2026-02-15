@@ -55,33 +55,51 @@ description: "功能描述，使用时机"  # 必需，1024字符内，第三人
 ### 结构要点
 
 - **命令式语言**：使用"提取文本"而非"你应该提取文本"
-- **路径规范**：使用 `{baseDir}` 和正斜杠，如 `Read {baseDir}/config.json`
+- **路径规范**：使用 `$CLAUDE_PROJECT_DIR` 和正斜杠，如 `Read $CLAUDE_PROJECT_DIR/.claude/skills/my-skill/config.json`
 - **渐进披露**：详细文档通过引用加载，保持 SKILL.md 简洁
 
-### 路径定义规范（重要）
+### 路径规范（重要）
+
+> **统一使用 `$CLAUDE_PROJECT_DIR` 环境变量**，确保跨工作目录的可靠路径解析。
 
 | 变量 | 定义 | 示例展开 |
 |------|------|----------|
-| `{baseDir}` | 当前技能的根目录 | `.claude/skills/my-skill/` |
-| `{projectRoot}` | 项目根目录 | `e:\Desk\my-project/` |
+| `$CLAUDE_PROJECT_DIR` | 项目根目录 | `e:\Desk\my-project/` |
 
 **使用规则**：
-- 技能内的脚本、配置 → 使用 `{baseDir}`
-- 项目共享资源、输出 → 使用 `{projectRoot}`
+- 所有绝对路径都使用 `$CLAUDE_PROJECT_DIR` 前缀
+- 技能内路径：`$CLAUDE_PROJECT_DIR/.claude/skills/skill-name/...`
 - 避免使用 `../` 相对路径，降低理解成本
 
 ```bash
 # 技能内脚本
-python {baseDir}/scripts/helper.py --save
-# → .claude/skills/my-skill/scripts/helper.py
+python $CLAUDE_PROJECT_DIR/.claude/skills/my-skill/scripts/helper.py --save
 
 # 项目共享脚本
-python {projectRoot}/shared-scripts/common.py
-# → e:\Desk\my-project/shared-scripts/common.py
+python $CLAUDE_PROJECT_DIR/shared-scripts/common.py
 
 # 输出到项目目录
-python {baseDir}/scripts/process.py --output {projectRoot}/outputs
+python $CLAUDE_PROJECT_DIR/.claude/skills/my-skill/scripts/process.py --output $CLAUDE_PROJECT_DIR/outputs
 ```
+
+```json
+// settings.json 中的 Hook 配置
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": ["$CLAUDE_PROJECT_DIR/.claude/hooks/pre-bash.sh"]
+      }
+    ]
+  }
+}
+```
+
+**为什么统一使用 `$CLAUDE_PROJECT_DIR`**：
+- 环境变量在运行时展开，不依赖当前工作目录
+- 避免相对路径在不同启动方式下解析失败
+- 一种规则，所有场景适用，降低记忆成本
 
 ---
 
@@ -509,11 +527,18 @@ skill-name/
 
 ---
 
-> 文档版本：2.2
-> 最后更新：2026-02-01
->
-> 更新说明：
-> - 9.1 新增调用方式对比表
-> - 9.2 新增 Skill 中显式调用 Subagent 推荐实践
-> - 9.3 更新 Subagent 中加载 Skill 示例
+> 文档版本：2.2
+
+> 最后更新：2026-02-01
+
+>
+
+> 更新说明：
+
+> - 9.1 新增调用方式对比表
+
+> - 9.2 新增 Skill 中显式调用 Subagent 推荐实践
+
+> - 9.3 更新 Subagent 中加载 Skill 示例
+
 > - 9.4 新增最佳实践总结
