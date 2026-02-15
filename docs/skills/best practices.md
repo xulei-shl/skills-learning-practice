@@ -328,7 +328,6 @@ description: "帮助处理文档"
 ### 9.1 调用方式对比
 
 
-
 | 调用方向 | 方式 | 说明 |
 
 |----------|------|------|
@@ -351,6 +350,7 @@ description: "帮助处理文档"
 
 
 
+
 ```markdown
 
 ---
@@ -363,11 +363,13 @@ description: "YouTube 智能精剪"
 
 
 
+
 # YouTube 智能精剪 Pro
 
 
 
 作为主智能体，你的职责是**指挥官**（Orchestrator），协调专家 Subagent 完成复杂任务。
+
 
 
 
@@ -391,7 +393,9 @@ description: "YouTube 智能精剪"
 
 
 
+
 ### Step 1: 调用 AnalysisAgent 分析内容
+
 
 
 
@@ -407,11 +411,13 @@ Task(
 
 
 
+
 ### Step 2: 并行调用 Subagents（扇出模式）
 
 
 
 对每个选中的章节，并行执行：
+
 
 
 
@@ -427,6 +433,7 @@ Task(
 
 
 
+
 Task(
 
     subagent_type="TweetAgent",
@@ -436,8 +443,8 @@ Task(
     prompt="根据 meta.json 生成推特风格的分享文案..."
 
 )
-
 ```
+
 
 
 
@@ -451,9 +458,9 @@ Task(
 
 ---
 
-name: research-agent
+name: research-agent,
 
-description: "研究代理"
+description: "研究代理",
 
 skills: research-skill, analysis-skill  # 加载指定 skills
 
@@ -463,13 +470,16 @@ model: sonnet
 
 
 
+
 # 研究子代理
+
 
 
 
 你是一个专业研究助手，使用加载的 skills 执行任务。
 
 ```
+
 
 
 
@@ -489,7 +499,7 @@ model: sonnet
 
 | ✅ 描述清晰 | 每个 Task 有明确的 description |
 
-| ❌ 避免隐藏 | 不要只依赖 frontmatter 的 skills 字段
+| ❌ 避免隐藏 | 不要只依赖 frontmatter 的 skills 字段 |
 
 ---
 
@@ -522,23 +532,23 @@ skill-name/
 | Skill/Subagent 使用规则 | [SKILL_SUBAGENT_BEST_PRACTICE.md](SKILL_SUBAGENT_BEST_PRACTICE.md) |
 | Subagent 创建 | [docs/subagents/Create custom subagents.md](../subagents/Create custom subagents.md) |
 | Skill 与 Subagent 协作 | [Skills work with subagents.md](Skills work with subagents.md) |
-| Subagent 示例 | [docs/subagents/subagent example-code simplifier.md](../subagents/subagent example-code simplifier.md) |
+| Subagent 示例 | [docs/subagents/subagent example-code simplifier.md](../subagents/subagent%20example-code%20simplifier.md) |
+| **Hooks 最佳实践** | **[Claude Code Hooks 最佳实践.md](../hooks/Claude%20Code%20Hooks%20最佳实践.md)** |
+| **Commands 最佳实践** | **[Claude Code Commands 最佳实践.md](../commands/Claude%20Code%20Commands%20最佳实践.md)** |
+| **Subagents 最佳实践** | **[Claude Code Subagents 最佳实践.md](../subagents/Claude%20Code%20Subagents%20最佳实践.md)** |
 | 动态提问实践 | [brainstorming 示例](../../examples/brainstorming/) |
 
 ---
 
-> 文档版本：2.2
+> 文档版本：2.3
 
-> 最后更新：2026-02-01
+> 最后更新：2026-02-15
 
 >
-
 > 更新说明：
 
-> - 9.1 新增调用方式对比表
+> - 新增 Hooks 最佳实践文档引用
 
-> - 9.2 新增 Skill 中显式调用 Subagent 推荐实践
+> - 新增 Commands 最佳实践文档引用
 
-> - 9.3 更新 Subagent 中加载 Skill 示例
-
-> - 9.4 新增最佳实践总结
+> - 新增 Subagents 最佳实践文档引用
